@@ -1,10 +1,14 @@
 import { router } from '@kit.ArkUI';
+import { http } from '@kit.NetworkKit';
+import { RootObject } from '../bean/RootObject';
 
 
 @Entry
 @Component
 struct Index {
   @State message: string = 'Hello World';
+
+  req=http.createHttp()
 
   build() {
     Column(){
@@ -14,8 +18,18 @@ struct Index {
       Button("退出")
         .fontSize(18)
         .onClick(()=>{
-          router.pushUrl({
-            url:"pages/Login"
+          this.req.request("https://www.wanandroid.com/user/logout/json",{
+            method:http.RequestMethod.GET,
+            header: { "Content-Type": "application/json" }
+          }).then(res=>{
+            let r:RootObject=JSON.parse(res.result+"") as RootObject
+            console.log("network",r.errorCode);
+            if(r.errorCode==0)
+            {
+              router.pushUrl({
+                url:"pages/Login"
+              })
+            }
           })
         })
 

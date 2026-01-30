@@ -73,8 +73,11 @@ struct Login {
           .width("45%")
           .margin(50)
           .onClick(()=>{
-            this.req.request("https://www.wanandroid.com/user/login",{
+            this.req.request(`https://www.wanandroid.com/user/login?username=${this.account}&password=${this.password}`,{
               method:http.RequestMethod.POST,
+              header:{
+                "content-type":"application/json;charset=UTF-8"
+              },
               extraData:{
                 username:this.account,
                 password:this.password
