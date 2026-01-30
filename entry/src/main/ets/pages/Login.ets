@@ -1,9 +1,18 @@
 import { router, Router } from '@kit.ArkUI';
+import {http} from '@kit.NetworkKit';
+import { JSON } from '@kit.ArkTS';
+import image from '@ohos.multimedia.image';
+
+import { RootObject } from '../bean/RootObject';
 
 @Entry
 @Component
 struct Login {
-  @State message: string = 'Hello World';
+  @State account: string = "";
+  @State password: string="";
+  @State errorMSg: string="";
+
+  req=http.createHttp()
 
   build() {
     Column(){
@@ -26,11 +35,15 @@ struct Login {
             width:{bottom:1}
           })
           .borderRadius(0)
+          .onChange(value=>{
+            this.account=value
+          })
 
         Text("密码")
           .fontSize(32)
           .fontWeight(FontWeight.Bold)
           .width("100%")
+
 
         TextInput({
           placeholder:"请输入密码"
@@ -41,6 +54,9 @@ struct Login {
             width:{bottom:1}
           })
           .borderRadius(0)
+          .onChange(value=>{
+            this.password=value
+          })
       }
       .width("100%")
       .border({
@@ -57,8 +73,26 @@ struct Login {
           .width("45%")
           .margin(50)
           .onClick(()=>{
-            router.pushUrl({
-              url:"pages/Index"
+            this.req.request("https://www.wanandroid.com/user/login",{
+              method:http.RequestMethod.POST,
+              extraData:{
+                username:this.account,
+                password:this.password
+              }
+            }).then(res=>{
+              console.log("POST",JSON.stringify(res))
+              let r:RootObject=JSON.parse(res.result+'') as RootObject
+              console.log("POST",r.errorCode)
+
+              if(r.errorCode==-1)
+              {
+                this.errorMSg=r.errorMsg
+              }else{
+                router.pushUrl({
+                  url:"pages/Index"
+                })
+              }
+
             })
           })
 
@@ -72,6 +106,7 @@ struct Login {
             })
           })
       }
+      Text(this.errorMSg)
 
     }
     .padding(25)
