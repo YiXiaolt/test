@@ -2,8 +2,8 @@ import { router, Router } from '@kit.ArkUI';
 import {http} from '@kit.NetworkKit';
 import { JSON } from '@kit.ArkTS';
 import image from '@ohos.multimedia.image';
-
 import { RootObject } from '../bean/RootObject';
+import { Constant } from "../common/Constant"
 
 @Entry
 @Component
@@ -87,13 +87,18 @@ struct Login {
               let r:RootObject=JSON.parse(res.result+'') as RootObject
               console.log("POST",r.errorCode)
 
-              if(r.errorCode==-1)
+              if(r.errorCode==0)
               {
-                this.errorMSg=r.errorMsg
-              }else{
+                console.log("network",JSON.stringify(r.data))
                 router.pushUrl({
                   url:"pages/Index"
                 })
+                AppStorage.setOrCreate(Constant.STORAGE_IS_LOGIN,false);
+                AppStorage.setOrCreate(Constant.STORAGE_USER_NAME, this.account);
+                AppStorage.setOrCreate(Constant.STORAGE_USER_PASSWORD, this.password);
+              }else{
+                this.errorMSg=r.errorMsg
+
               }
 
             })
